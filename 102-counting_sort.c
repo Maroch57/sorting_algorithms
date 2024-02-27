@@ -1,60 +1,44 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "sort.h"
 
 /**
- * counting_sort - Sorts an array of integers in ascending order
- * using the Counting sort algorithm
- * @array: The array to be sorted
- * @size: Size of the array
+ * counting_sort - sorts an array with the Counting sort algorithm
+ * @array: array to sort
+ * @size: size of the array
  */
 void counting_sort(int *array, size_t size)
 {
-	int max, *output, *count;
-	size_t i;
+	int *count_arr, *out_arr, max, num, j, l;
+	size_t i, k, m, n;
 
-    if (array == NULL || size < 2)
-        return;
-    max = array[0];
-    for (i = 1; i < size; i++)
-    {
-        if (array[i] > max)
-            max = array[i];
-    }
+	if (size < 2)
+		return;
 
-    count = malloc((max + 1) * sizeof(int));
-    if (count == NULL)
-        return;
+	max = array[0];
+	for (i = 1; i < size; i++)
+		if (array[i] > max)
+			max = array[i];
 
-    for (i = 0; i <= (size_t)max; i++)
-        count[i] = 0;
+	count_arr = malloc(sizeof(size_t) * (max + 1));
+	out_arr = malloc(sizeof(int) * size);
 
-    for (i = 0; i < size; i++)
-        count[array[i]]++;
+	for (j = 0; j <= max; j++)
+		count_arr[j] = 0;
+	for (k = 0; k < size; k++)
+	{
+		num = array[k];
+		count_arr[num] += 1;
+	}
+	for (l = 1; l <= max; l++)
+		count_arr[l] += count_arr[l - 1];
+	print_array(count_arr, max + 1);
+	for (m = 0; m < size; m++)
+	{
+		out_arr[count_arr[array[m]] - 1] = array[m];
+		count_arr[array[m]]--;
+	}
+	for (n = 0; n < size; n++)
+		array[n] = out_arr[n];
 
-    printf("Counting array: ");
-    for (i = 0; i <= (size_t)max; i++)
-        printf("%d%s", count[i], i == (size_t)max ? "\n" : ", ");
-
-    for (i = 1; i <= (size_t)max; i++)
-        count[i] += count[i - 1];
-
-    output = malloc(size * sizeof(int));
-    if (output == NULL)
-    {
-        free(count);
-        return;
-    }
-
-    for (i = 0; i < size; i++)
-    {
-        output[count[array[i]] - 1] = array[i];
-        count[array[i]]--;
-    }
-
-    for (i = 0; i < size; i++)
-        array[i] = output[i];
-
-    free(count);
-    free(output);
+	free(count_arr);
+	free(out_arr);
 }
